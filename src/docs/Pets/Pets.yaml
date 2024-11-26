@@ -1,0 +1,148 @@
+paths:
+  /api/pets/:
+    get:
+      summary: Obtiene todas las mascotas
+      tags:
+        - Pets
+      responses:
+        "200":
+          description: Las mascotas fueron obtenidos satisfactoriamente de la base de datos
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#components/schemas/Pet'
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conxeión con la base de datos
+
+    post:
+      summary: Crea una nueva mascota
+      tags:
+        - Pets
+      requestBody:
+        description: Mascota a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/requestBodies/Pet'
+      responses:
+        "200":
+          description: Mascota creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  payload:
+                    type: object
+                    $ref: '#components/schemas/Pet'
+        "400":  
+          description: Parametros invalidos
+
+  /api/pets/withimage:
+    post:
+      summary: Crea una nueva mascota con imagen
+      tags:
+        - Pets
+      requestBody:
+        description: Mascota a crear
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/requestBodies/Pet'
+                - type: object
+                  properties:
+                    image:
+                      type: string
+                      format: binary
+                      description: Imagen de la mascota
+      responses:
+        "200":
+          description: Mascota creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  payload:
+                    type: object
+                    $ref: '#components/schemas/Pet'
+        "400":  
+          description: Parametros invalidos
+
+  /api/pets/{pid}:
+    put:
+      summary: Actualiza una mascota a partir de su id
+      tags:
+        - Pets
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id de la mascota a actualizar.
+          schema:
+            type: string
+      requestBody:
+        description: Propiedades a actualizar
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/requestBodies/Pet'
+      responses:
+        "200":
+          description: Mascota actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: pet updated
+
+    delete:
+      summary: Eliminar una mascota por id
+      tags:
+        - Pets
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id de la mascota a eliminar.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Mascota eliminada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: pet deleted

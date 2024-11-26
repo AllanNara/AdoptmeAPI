@@ -1,0 +1,115 @@
+paths:
+  /api/sessions/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Session
+      requestBody:
+        description: Usuario nuevo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/requestBodies/User'
+      responses:
+        "200":
+          description: Usuario registrado satisfactoriamente
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  payload:
+                    type: ObjectId
+                    example: 65ef7085ed5e0f2672bc14fc
+        "400": 
+          description: Parametros invalidos
+        "409":
+          description: Email ya registrado
+
+  /api/sessions/login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Session
+      requestBody:
+        description: Credenciales
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/requestBodies/Credentials'
+      security: []
+      responses:
+        "200":
+          description: >
+            Usuario logeado con exito
+            El ID de la sesión retorna en una cookie `coderCookie`.
+            Debe incluir esta cookie en solicitudes posteriores.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: >
+                  coderCookie=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9; Path=/;
+                  Expires=Mon, 25 Nov 2024 16:57:49 GMT;
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Logged in
+        "400": 
+          description: Parametros invalidos o credenciales incorrectas
+        "404":
+          description: Usuario no encontrado
+
+
+  /api/sessions/logout:
+    post:
+      summary: Finaliza la sesión actual
+      tags:
+        - Session
+      responses:
+        "200":
+          description: Sesión finalizada
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  message: 
+                    type: string
+                    example: Logged out
+
+  /api/sessions/current:
+    get:
+      summary: Obtiene el usuario actual a partir de la cookie
+      tags:
+        - Session
+      responses:
+        "200":
+          description: Usuario actual
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string 
+                    example: success
+                  payload:
+                    $ref: '#components/schemas/UserCookie'
+        "401":
+          description: No hay sesion activa

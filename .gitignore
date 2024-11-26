@@ -1,0 +1,6 @@
+node_modules
+/.vscode
+/src/public/img
+/logs
+
+.env
