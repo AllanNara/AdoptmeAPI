@@ -11,5 +11,7 @@ before(async () => {
 });
   
 after(async () => {
+    await mongoose.connection.collections.pets.drop();
+    await mongoose.connection.collections.users.drop();
     await mongoose.disconnect()
 });

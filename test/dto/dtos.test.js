@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { fakePet } from "../../src/services/mocks/pets.js";
+import { fakePetBody } from "../../src/services/mocks/pets.js";
 import PetDTO from "../../src/dto/Pet.dto.js";
 import { fakeUser } from "../../src/services/mocks/users.js";
 import UserDTO from "../../src/dto/User.dto.js";
@@ -8,18 +8,17 @@ const expect = chai.expect;
 
 describe("Testing Dtos", function() {
     it("El dto de Pet debe eliminar propiedades innecesarias", async function(){
-        const pet = fakePet();
+        const pet = fakePetBody();
         pet.extra = "esta es una propiedad intrusa";
         pet.mother = "jane doe";
         const petDTO = PetDTO.getPetInputFrom(pet);
-        expect(petDTO).to.not.have.property("extra");
         expect(petDTO).to.not.have.property("owner");
+        expect(petDTO).to.not.have.property("extra");
         expect(petDTO).to.not.have.property("mother");
     })
 
     it("El dto de Pet debe incorporar la propiedad 'adopted' en false", async function(){
-        const pet = fakePet();
-        delete pet.adopted;
+        const pet = fakePetBody();
         const petDTO = PetDTO.getPetInputFrom(pet);
         expect(petDTO).to.be.deep.equal({ 
             adopted: false, 

@@ -25,7 +25,7 @@ const createPet = async(req,res,next)=> {
         }
         const pet = PetDTO.getPetInputFrom({name,specie,birthDate});
         const result = await petsService.create(pet);
-        res.send({status:"success",payload:result})
+        res.status(201).send({status:"success",payload:result})
     } catch (error) {
         next(error)
     }
@@ -34,14 +34,14 @@ const createPet = async(req,res,next)=> {
 const updatePet = async(req,res) =>{
     const petUpdateBody = req.body;
     const petId = req.params.pid;
-    const result = await petsService.update(petId,petUpdateBody);
-    res.send({status:"success",message:"pet updated"})
+    await petsService.update(petId,petUpdateBody);
+    res.sendStatus(204);
 }
 
 const deletePet = async(req,res)=> {
     const petId = req.params.pid;
-    const result = await petsService.delete(petId);
-    res.send({status:"success",message:"pet deleted"});
+    await petsService.delete(petId);
+    res.sendStatus(204);
 }
 
 const createPetWithImage = async(req,res,next) =>{
@@ -65,7 +65,7 @@ const createPetWithImage = async(req,res,next) =>{
         });
         logger.debug(pet);
         const result = await petsService.create(pet);
-        res.send({status:"success",payload:result})
+        res.status(201).send({status:"success",payload:result})
     } catch (error) {
        next(error) 
     }

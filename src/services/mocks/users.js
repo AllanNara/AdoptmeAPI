@@ -20,3 +20,12 @@ export const fakeUser = async () => {
         pets: []
     }
 }
+
+export const fakeUserBody = () => {
+    return {
+        first_name: faker.person.firstName(),
+        last_name: faker.person.lastName(),
+        email: faker.internet.email(),
+        password: faker.color.human()
+    }
+}

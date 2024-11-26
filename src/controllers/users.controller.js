@@ -57,7 +57,7 @@ const updateUser =async(req,res,next)=>{
             })
         }
         const result = await usersService.update(userId,updateBody);
-        res.send({status:"success",message:"User updated"})
+        res.sendStatus(204);
     } catch (error) {
        next(error) 
     }
@@ -75,7 +75,7 @@ const deleteUser = async(req,res,next) =>{
            })
         }   
         const result = await usersService.delete(userId);
-        res.send({status:"success",message:"User deleted"})
+        res.sendStatus(204);
     } catch (error) {
         next(error) 
     }
