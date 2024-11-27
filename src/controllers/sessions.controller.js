@@ -74,25 +74,29 @@ const login = async (req, res, next) => {
     }
     const userDto = UserDTO.getUserTokenFrom(user);
     const token = jwt.sign(userDto, "tokenSecretJWT", { expiresIn: "1h" });
-    res
-      .cookie("coderCookie", token, {
-        maxAge: 1000 * 60 * 60 * 24,
-        httpOnly: true,
-        sameSite: "Strict",
-      })
-      .send({ status: "success", message: "Logged in" });
+    res.cookie("coderCookie", token, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+      sameSite: "Strict",
+    });
+    await usersService.update(user._id, { last_connection: new Date() });
+    res.send({ status: "success", message: "Logged in" });
   } catch (error) {
     next(error);
   }
 };
 
-const logout = (req, res) => {
-  res
-    .clearCookie("coderCookie", {
-        httpOnly: true,
-        sameSite: "Strict",
-      })
-    .send({ status: "success", message: "Logged out" });
+const logout = async (req, res) => {
+  const cookie = req.cookies["coderCookie"];
+  if (cookie) {
+    const user = jwt.verify(cookie, "tokenSecretJWT");
+    user && await usersService.updateUserByEmail(user.email, { last_connection: new Date() });
+  }
+  res.clearCookie("coderCookie", {
+    httpOnly: true,
+    sameSite: "Strict",
+  });
+  res.send({ status: "success", message: "Logged out" });
 };
 
 const current = async (req, res, next) => {

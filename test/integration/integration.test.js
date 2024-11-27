@@ -15,9 +15,28 @@ const expect = chai.expect;
 const requester = supertest(ORIGIN);
 
 describe("**Integration Tests**", function () {
-  let cookie = {};
   describe("Test de Sessiones", function () {
     const userDataMock = fakeUserBody();
+    let cookie = {};
+    let userCoder = {
+      first_name: "Coder",
+      last_name: "House",
+      email: "coder@mail.com",
+      password: "coder123",
+    };
+
+    this.timeout(5000);
+    before(async function () {
+      this.usersDao = new Users();
+      const { _body } = await requester
+        .post("/api/sessions/register")
+        .send(userCoder);
+      userCoder._id = _body.payload;
+    });
+
+    after(async function () {
+      await this.usersDao.delete(userCoder._id);
+    });
 
     it("Debe registrar correctamente a un usuario con codigo de estado 201", async function () {
       const { _body, statusCode } = await requester
@@ -25,7 +44,7 @@ describe("**Integration Tests**", function () {
         .send(userDataMock);
 
       expect(_body.payload).to.be.ok;
-      expect(statusCode).to.be.equal(201)
+      expect(statusCode).to.be.equal(201);
       expect(mongoose.Types.ObjectId.isValid(_body.payload)).to.be.true;
     });
 
@@ -57,16 +76,42 @@ describe("**Integration Tests**", function () {
     it("Debe poder cerrar la sesion correctamente limpiando la cookie", async function () {
       const result = await requester.post("/api/sessions/logout");
       expect(result.statusCode).to.be.equal(200);
-      expect(result._body.status).to.be.equal("success")
+      expect(result._body.status).to.be.equal("success");
 
       const cookieResult = result.headers["set-cookie"][0];
       cookie.name = cookieResult.split("=")[0];
-      if(cookieResult.includes(`${cookie.name}=;`)) {
+      if (cookieResult.includes(`${cookie.name}=;`)) {
         cookie.value = "";
       }
       expect(cookie.name).to.be.ok.and.equal("coderCookie");
       expect(cookie.value).to.be.not.ok;
-    })
+    });
+
+    it("Debería actualizar last_connection al hacer login", async function () {
+      await requester
+        .post("/api/sessions/login")
+        .send({ email: userCoder.email, password: userCoder.password });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const user = await this.usersDao.getBy({ email: userCoder.email });
+
+      expect(user.last_connection).to.be.a("date");
+      const difference = new Date() - new Date(user.last_connection);
+      expect(difference).to.be.greaterThan(2000);
+      expect(difference).to.be.lessThan(5000);
+    });
+
+    it("debería actualizar last_connection al hacer logout", async function () {
+      await requester.post("/api/sessions/logout");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const user = await this.usersDao.getBy({ email: userCoder.email });
+
+      expect(user.last_connection).to.be.a("date");
+      const difference = new Date() - new Date(user.last_connection);
+      expect(difference).to.be.greaterThan(2000);
+      expect(difference).to.be.lessThan(5000);
+    });
   });
 
   describe("Test de usuarios", function () {
