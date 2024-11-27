@@ -56,14 +56,14 @@ const createPetWithImage = async(req,res,next) =>{
             code: EErrors.INVALID_TYPES_ERROR
           });
         }
-        logger.debug(file);
+        logger.debug("file", file);
         const pet = PetDTO.getPetInputFrom({
             name,
             specie,
             birthDate,
             image: path.join(`${__dirname}`,`/../public/img/${file.filename}`)
         });
-        logger.debug(pet);
+        logger.debug("pet", pet);
         const result = await petsService.create(pet);
         res.status(201).send({status:"success",payload:result})
     } catch (error) {

@@ -34,7 +34,7 @@ const register = async (req, res, next) => {
       password: hashedPassword,
     };
     let result = await usersService.create(user);
-    res.send({ status: "success", payload: result._id });
+    res.status(201).send({ status: "success", payload: result._id });
   } catch (error) {
     next(error)
   }

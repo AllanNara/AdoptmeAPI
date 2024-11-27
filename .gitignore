@@ -1,6 +1,6 @@
 node_modules
 /.vscode
-/src/public/img
+/src/public/img/*
 /logs
 
 .env
