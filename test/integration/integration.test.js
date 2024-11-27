@@ -53,6 +53,20 @@ describe("**Integration Tests**", function () {
         `${userDataMock.first_name} ${userDataMock.last_name}`
       );
     });
+
+    it("Debe poder cerrar la sesion correctamente limpiando la cookie", async function () {
+      const result = await requester.post("/api/sessions/logout");
+      expect(result.statusCode).to.be.equal(200);
+      expect(result._body.status).to.be.equal("success")
+
+      const cookieResult = result.headers["set-cookie"][0];
+      cookie.name = cookieResult.split("=")[0];
+      if(cookieResult.includes(`${cookie.name}=;`)) {
+        cookie.value = "";
+      }
+      expect(cookie.name).to.be.ok.and.equal("coderCookie");
+      expect(cookie.value).to.be.not.ok;
+    })
   });
 
   describe("Test de usuarios", function () {
