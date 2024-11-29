@@ -8,6 +8,7 @@ import { fakePetBody } from "../../src/services/mocks/pets.js";
 import { fakeUserBody } from "../../src/services/mocks/users.js";
 import Pet from "../../src/dao/Pets.dao.js";
 import Users from "../../src/dao/Users.dao.js";
+import { passwordValidation } from "../../src/utils/index.js";
 
 const ORIGIN = `${config.PROTOCOL}://${config.HOST}:${config.PORT}`;
 
@@ -62,11 +63,12 @@ describe("**Integration Tests**", function () {
       expect(cookie.value).to.be.ok;
     });
 
-    it("Debe enviar la cookie que contiene el usuario y destructurar éste correctamente", async function () {
+    it("Debe enviar la cookie que contiene el usuario sin comprometer información sensible del usuario", async function () {
       const { _body } = await requester
         .get("/api/sessions/current")
         .set("Cookie", [`${cookie.name}=${cookie.value}`]);
 
+      expect(_body.payload).not.deep.include.keys("password");
       expect(_body.payload.email).to.be.equal(userDataMock.email);
       expect(_body.payload.name).to.be.equal(
         `${userDataMock.first_name} ${userDataMock.last_name}`
@@ -101,7 +103,7 @@ describe("**Integration Tests**", function () {
       expect(difference).to.be.lessThan(5000);
     });
 
-    it("debería actualizar last_connection al hacer logout", async function () {
+    it("Debería actualizar last_connection al hacer logout", async function () {
       await requester.post("/api/sessions/logout");
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -115,12 +117,25 @@ describe("**Integration Tests**", function () {
   });
 
   describe("Test de usuarios", function () {
+    let userDataMock = fakeUserBody();
     let userMock;
 
     before(async function () {
       this.usersDao = new Users();
-      userMock = await this.usersDao.save(fakeUserBody());
-      userMock = JSON.parse(JSON.stringify(userMock));
+    });
+
+    it("La contraseña del usuario debe guardarse hasheada en la base de datos", async function () {
+      const { _body } = await requester
+        .post("/api/sessions/register")
+        .send(userDataMock);
+
+      userMock = JSON.parse(
+        JSON.stringify(await this.usersDao.getBy({ _id: _body.payload }))
+      );
+
+      const { password: passMock } = userDataMock;
+      expect(userMock.password).to.be.not.deep.equal(passMock);
+      expect(await passwordValidation(userMock, passMock)).is.true
     });
 
     it("GET /api/users debe devolver una lista de usuarios en la propiedad 'payload'", async function () {
@@ -129,22 +144,21 @@ describe("**Integration Tests**", function () {
       expect(body.payload[0]).to.be.deep.include.keys(userMock);
     });
     it("GET /api/users/:uid debe poder obtener un usuario por su ID", async function () {
-      const getUser = await this.usersDao.getBy({ _id: userMock._id });
-      const userGetParse = JSON.parse(JSON.stringify(getUser));
-      expect(userGetParse).to.be.deep.equal(userMock);
+      const { _body } = await requester.get("/api/users/" + userMock._id);
+      expect(_body.payload).to.be.deep.equal(userMock);
     });
     it("PUT /api/users/:uid debe poder actualizar correctamente a un usuario por su ID", async function () {
-      const userDataMock = fakeUserBody();
+      const newDataToUpload = fakeUserBody();
       const { ok } = await requester
         .put(`/api/users/${userMock._id}`)
-        .send(userDataMock);
+        .send(newDataToUpload);
 
       const getUser = await this.usersDao.getBy({ _id: userMock._id });
       const userUpdateParse = JSON.parse(JSON.stringify(getUser));
 
       expect(ok).to.be.equal(true);
       expect(userUpdateParse).to.be.not.deep.equal(userMock);
-      expect(userUpdateParse).to.be.include(userDataMock);
+      expect(userUpdateParse).to.be.include(newDataToUpload);
     });
     it("DELETE /api/users/:uid debe poder eliminar un usuario por su ID", async function () {
       const { ok } = await requester.delete(`/api/users/${userMock._id}`);
@@ -209,7 +223,9 @@ describe("**Integration Tests**", function () {
     const petMock = fakePetBody();
 
     after(async function () {
-      const files = await fs.promises.readdir(path.resolve("src/public/uploads/pets"));
+      const files = await fs.promises.readdir(
+        path.resolve("src/public/uploads/pets")
+      );
       files.forEach((file) => {
         if (file.includes("coder")) {
           fs.unlinkSync(path.resolve(`src/public/uploads/pets/${file}`));
@@ -223,7 +239,7 @@ describe("**Integration Tests**", function () {
         .field("name", petMock.name)
         .field("specie", petMock.specie)
         .field("birthDate", petMock.birthDate)
-        .attach("image", "test/coderDog.jpg");
+        .attach("image", "test/assets/coderDog.jpg");
 
       expect(responsePost.statusCode).to.be.equal(201);
       expect(responsePost.body.payload).to.have.property("_id");
