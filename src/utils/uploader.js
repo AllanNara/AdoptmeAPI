@@ -1,9 +1,18 @@
+import path from "path";
 import __dirname from "./index.js";
 import multer from 'multer';
 
 const storage = multer.diskStorage({
     destination:function(req,file,cb){
-        cb(null,`${__dirname}/../public/img`)
+        let folder;
+        if(req.baseUrl === "/api/pets") {
+            folder = "pets"
+        } else if(req.baseUrl === "/api/pets") {
+            folder = "documents"
+        }
+        if(!folder) throw new Error("Missing folder name")
+        const pathImg = path.resolve("src", "public", "uploads", folder)
+        cb(null, pathImg)
     },
     filename:function(req,file,cb){
         cb(null,`${Date.now()}-${file.originalname}`)

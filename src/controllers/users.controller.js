@@ -81,9 +81,19 @@ const deleteUser = async(req,res,next) =>{
     }
 }
 
+const uploadDocuments = async(req, res, next) => {
+    const files = req.file;
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
 export default {
     deleteUser,
     getAllUsers,
     getUser,
-    updateUser
+    updateUser,
+    uploadDocuments
 }

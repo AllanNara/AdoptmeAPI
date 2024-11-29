@@ -209,10 +209,10 @@ describe("**Integration Tests**", function () {
     const petMock = fakePetBody();
 
     after(async function () {
-      const files = await fs.promises.readdir(path.resolve("src/public/img"));
+      const files = await fs.promises.readdir(path.resolve("src/public/uploads/pets"));
       files.forEach((file) => {
         if (file.includes("coder")) {
-          fs.unlinkSync(path.resolve(`src/public/img/${file}`));
+          fs.unlinkSync(path.resolve(`src/public/uploads/pets/${file}`));
         }
       });
     });
