@@ -1,0 +1,12 @@
+services:
+  db:
+    image: mongo:7.0
+    container_name: mongo
+    ports:
+      - "27017:27017" # Expone el puerto 27017 para poder acceder a la base de datos
+    volumes:
+      - mongo_data:/data/db # Monta un volumen persistente para los datos de MongoDB
+    restart: always # Reinicia el contenedor si se cae
+
+volumes:
+  mongo_data:

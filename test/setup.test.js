@@ -13,12 +13,10 @@ before(async () => {
     server = app.listen(config.PORT, () => {
         logger.info("Server running for tests");
     });
-    await mongoose.connect(config.MONGO_URI);
+    await mongoose.connect(config.MONGO_URI);  
 });
   
 after(async () => {
-    await mongoose.connection.collections.pets.drop();
-    await mongoose.connection.collections.users.drop();
     await mongoose.connection.dropDatabase();
     await mongoose.disconnect()
     await server.close()
