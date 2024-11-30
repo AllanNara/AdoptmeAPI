@@ -10,6 +10,8 @@ export const createHash = async(password) =>{
 
 export const passwordValidation = async(user,password) => await bcrypt.compare(password,user.password);
 
+export const documentUserFields = ["certified", "identification", "cv-pet", "picture"]
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 

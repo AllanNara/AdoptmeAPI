@@ -5,7 +5,6 @@ import __dirname from "../utils/index.js";
 import CustomError from "../services/errors/CustomError.js"
 import { generatePetErrorInfo } from "../services/errors/info.js";
 import EErrors from "../services/errors/enums.js";
-import logger from "../utils/winston.js";
 
 const getAllPets = async(req,res)=>{
     const pets = await petsService.getAll();
@@ -56,14 +55,12 @@ const createPetWithImage = async(req,res,next) =>{
             code: EErrors.INVALID_TYPES_ERROR
           });
         }
-        logger.debug("file", file);
         const pet = PetDTO.getPetInputFrom({
             name,
             specie,
             birthDate,
             image: path.join(`${__dirname}`,`/../public/img/${file.filename}`)
         });
-        logger.debug("pet", pet);
         const result = await petsService.create(pet);
         res.status(201).send({status:"success",payload:result})
     } catch (error) {

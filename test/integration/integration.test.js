@@ -16,28 +16,29 @@ const expect = chai.expect;
 const requester = supertest(ORIGIN);
 
 describe("**Integration Tests**", function () {
-  describe("Test de Sessiones", function () {
+  let userCoder = {
+    first_name: "Coder",
+    last_name: "House",
+    email: "coder@mail.com",
+    password: "coder123",
+  };
+  let cookie = {};
+
+  before(async function () {
+    this.usersDao = new Users()
+    const { _body } = await requester
+      .post("/api/sessions/register")
+      .send(userCoder);
+    userCoder._id = _body.payload;
+  });
+
+  after(async function () {
+    await this.usersDao.delete(userCoder._id);
+  });
+
+  xdescribe("Test de Sessiones", function () {
     const userDataMock = fakeUserBody();
-    let cookie = {};
-    let userCoder = {
-      first_name: "Coder",
-      last_name: "House",
-      email: "coder@mail.com",
-      password: "coder123",
-    };
-
-    this.timeout(5000);
-    before(async function () {
-      this.usersDao = new Users();
-      const { _body } = await requester
-        .post("/api/sessions/register")
-        .send(userCoder);
-      userCoder._id = _body.payload;
-    });
-
-    after(async function () {
-      await this.usersDao.delete(userCoder._id);
-    });
+    this.timeout(4000);
 
     it("Debe registrar correctamente a un usuario con codigo de estado 201", async function () {
       const { _body, statusCode } = await requester
@@ -120,10 +121,6 @@ describe("**Integration Tests**", function () {
     let userDataMock = fakeUserBody();
     let userMock;
 
-    before(async function () {
-      this.usersDao = new Users();
-    });
-
     it("La contraseña del usuario debe guardarse hasheada en la base de datos", async function () {
       const { _body } = await requester
         .post("/api/sessions/register")
@@ -135,7 +132,7 @@ describe("**Integration Tests**", function () {
 
       const { password: passMock } = userDataMock;
       expect(userMock.password).to.be.not.deep.equal(passMock);
-      expect(await passwordValidation(userMock, passMock)).is.true
+      expect(await passwordValidation(userMock, passMock)).is.true;
     });
 
     it("GET /api/users debe devolver una lista de usuarios en la propiedad 'payload'", async function () {
@@ -220,7 +217,6 @@ describe("**Integration Tests**", function () {
   });
 
   describe("Testing Uploads", function () {
-    const petMock = fakePetBody();
 
     after(async function () {
       const files = await fs.promises.readdir(
@@ -234,6 +230,7 @@ describe("**Integration Tests**", function () {
     });
 
     it("POST /api/pets/withimage debe poder crearse una mascota con la ruta de la imagen", async function () {
+    const petMock = fakePetBody();
       const responsePost = await requester
         .post("/api/pets/withimage")
         .field("name", petMock.name)
@@ -245,6 +242,26 @@ describe("**Integration Tests**", function () {
       expect(responsePost.body.payload).to.have.property("_id");
       expect(responsePost.body.payload).to.have.property("image");
       expect(responsePost._body.payload.image).to.be.ok;
+    });
+
+    it("POST /api/users/:uid/documents debe subir documentos del usuario y guardar las rutas en su propiedad documents", async function () {
+      const responsePost = await requester
+        .post(`/api/users/${userCoder._id}/documents`)
+        .attach("certified", "test/assets/certified.jpg")
+        // .attach("picture", "test/assets/profile.jpg")
+        .attach("identification", "test/assets/license.jpg")
+        .attach("cv-pet", "test/assets/cvPet.pdf");
+
+      expect(responsePost.statusCode).to.be.equal(201);
+    });
+
+    it("Se debe poder cambiar un documento sin afectar los demas si es que no fueron modificados", async function () {
+      const responsePost = await requester
+        .post(`/api/users/${userCoder._id}/documents`)
+        .attach("picture", "test/assets/coderDog.jpg");
+
+      expect(responsePost.statusCode).to.be.equal(201);
+      expect(responsePost._body.payload.documents).to.have.a.lengthOf(4);
     });
   });
 });

@@ -1,7 +1,8 @@
 node_modules
 /.vscode
 /src/public/img/*
-/src/public/uploads/*
+/src/public/uploads/pets/*
+/src/public/uploads/documents/*
 /logs
 
 .env

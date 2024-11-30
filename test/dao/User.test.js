@@ -22,8 +22,12 @@ describe("Testing Users Dao", function() {
         expect(userMock._id).to.be.ok;
     })
 
-    it("El dao agregará al documento insertado un arreglo de mascotas vacío por defecto", async function(){
+    it("El dao agregará una propiedad 'pets' como un arreglo vacío por defecto", async function(){
         expect(userMock.pets).to.be.deep.equal([]);
+    })
+
+    it("El dao agregará una propiedad 'documents' como un arreglo vacío por defecto", async function(){
+        expect(userMock.documents).to.be.deep.equal([]);
     })
 
     it("El dao puede obtener a un usuario por email", async function(){

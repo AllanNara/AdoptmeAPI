@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
         let folder;
         if(req.baseUrl === "/api/pets") {
             folder = "pets"
-        } else if(req.baseUrl === "/api/pets") {
+        } else if(req.baseUrl === "/api/users") {
             folder = "documents"
         }
         if(!folder) throw new Error("Missing folder name")
