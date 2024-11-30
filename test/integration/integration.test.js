@@ -219,13 +219,22 @@ describe("**Integration Tests**", function () {
   describe("Testing Uploads", function () {
 
     after(async function () {
-      const files = await fs.promises.readdir(
+      const filePets = await fs.promises.readdir(
         path.resolve("src/public/uploads/pets")
       );
-      files.forEach((file) => {
+      filePets.forEach((file) => {
         if (file.includes("coder")) {
           fs.unlinkSync(path.resolve(`src/public/uploads/pets/${file}`));
         }
+      });
+
+      const fileDocs = await fs.promises.readdir(
+        path.resolve("src/public/uploads/documents")
+      );
+      fileDocs.forEach((file) => {
+        // if (file.includes("coder")) {
+          fs.unlinkSync(path.resolve(`src/public/uploads/documents/${file}`));
+        // }
       });
     });
 
@@ -248,7 +257,7 @@ describe("**Integration Tests**", function () {
       const responsePost = await requester
         .post(`/api/users/${userCoder._id}/documents`)
         .attach("certified", "test/assets/certified.jpg")
-        // .attach("picture", "test/assets/profile.jpg")
+        .attach("picture", "test/assets/profile.jpg")
         .attach("identification", "test/assets/license.jpg")
         .attach("cv-pet", "test/assets/cvPet.pdf");
 
