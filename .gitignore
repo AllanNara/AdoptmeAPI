@@ -3,6 +3,7 @@ node_modules
 /src/public/img/*
 /src/public/uploads/pets/*
 /src/public/uploads/documents/*
+/src/public/tests
 /logs
 
 .env

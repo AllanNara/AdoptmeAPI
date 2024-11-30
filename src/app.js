@@ -1,5 +1,4 @@
 import cookieParser from "cookie-parser";
-import displayRoutes from "express-routemap";
 import express from "express";
 import mongoose from "mongoose";
 import path from "path";
@@ -58,15 +57,5 @@ app.use("/api/sessions", sessionsRouter);
 app.use("/api/mocks", mocksRouter);
 app.use(errorHandle);
 
-mongoose.connection.on("connected", () => {
-  app.listen(config.PORT, () => {
-    displayRoutes(app);
-    logger.info("Mongo Database connected");
-    logger.info(`Listening on ${config.PORT}`)
-    });
-});
 
-mongoose.connection.on("error", (error) => {
-  logger.fatal(error);
-});
-
+export default app

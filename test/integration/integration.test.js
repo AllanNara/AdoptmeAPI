@@ -1,6 +1,5 @@
 import * as chai from "chai";
 import fs from "fs";
-import path from "path";
 import supertest from "supertest";
 import mongoose from "mongoose";
 import config from "../../config/index.js";
@@ -9,11 +8,12 @@ import { fakeUserBody } from "../../src/services/mocks/users.js";
 import Pet from "../../src/dao/Pets.dao.js";
 import Users from "../../src/dao/Users.dao.js";
 import { passwordValidation } from "../../src/utils/index.js";
+import app from "../../src/app.js";
 
 const ORIGIN = `${config.PROTOCOL}://${config.HOST}:${config.PORT}`;
 
 const expect = chai.expect;
-const requester = supertest(ORIGIN);
+const requester = supertest(app);
 
 describe("**Integration Tests**", function () {
   let userCoder = {
@@ -36,7 +36,7 @@ describe("**Integration Tests**", function () {
     await this.usersDao.delete(userCoder._id);
   });
 
-  xdescribe("Test de Sessiones", function () {
+  describe("Test de Sessiones", function () {
     const userDataMock = fakeUserBody();
     this.timeout(4000);
 
@@ -218,24 +218,16 @@ describe("**Integration Tests**", function () {
 
   describe("Testing Uploads", function () {
 
-    after(async function () {
-      const filePets = await fs.promises.readdir(
-        path.resolve("src/public/uploads/pets")
-      );
-      filePets.forEach((file) => {
-        if (file.includes("coder")) {
-          fs.unlinkSync(path.resolve(`src/public/uploads/pets/${file}`));
-        }
-      });
+    before(function () {
+      if(!fs.existsSync("src/public/tests")) {
+        fs.mkdirSync("src/public/tests");
+      }
+    })
 
-      const fileDocs = await fs.promises.readdir(
-        path.resolve("src/public/uploads/documents")
-      );
-      fileDocs.forEach((file) => {
-        // if (file.includes("coder")) {
-          fs.unlinkSync(path.resolve(`src/public/uploads/documents/${file}`));
-        // }
-      });
+    after(function () {
+      if(fs.existsSync("src/public/tests")) {
+        fs.rmSync("src/public/tests", { recursive: true });
+      }
     });
 
     it("POST /api/pets/withimage debe poder crearse una mascota con la ruta de la imagen", async function () {
