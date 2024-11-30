@@ -8,12 +8,11 @@ import { fakeUserBody } from "../../src/services/mocks/users.js";
 import Pet from "../../src/dao/Pets.dao.js";
 import Users from "../../src/dao/Users.dao.js";
 import { passwordValidation } from "../../src/utils/index.js";
-import app from "../../src/app.js";
 
 const ORIGIN = `${config.PROTOCOL}://${config.HOST}:${config.PORT}`;
 
 const expect = chai.expect;
-const requester = supertest(app);
+const requester = supertest(ORIGIN);
 
 describe("**Integration Tests**", function () {
   let userCoder = {

@@ -55,6 +55,9 @@ app.use("/api/pets", petsRouter);
 app.use("/api/adoptions", adoptionsRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/mocks", mocksRouter);
+app.use("*", (req, res) => {
+  res.status(404).send({ status: "error", message: "Route not found", route: req.originalUrl, method: req.method });
+})
 app.use(errorHandle);
 
 

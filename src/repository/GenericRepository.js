@@ -20,6 +20,10 @@ export default class GenericRepository {
         return this.dao.update(id,doc);
     }
 
+    updateBy = (params,doc) =>{
+        return this.dao.updateBy(params,doc);
+    }
+
     delete = (id) =>{
         return this.dao.delete(id);
     }

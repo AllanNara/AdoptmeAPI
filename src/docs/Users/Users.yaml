@@ -115,3 +115,51 @@ paths:
           description: Parametros invalidos
         "404":
           description: Usuario no encontrado
+
+  /api/users/{uid}/documents:
+    post:
+      summary: Subir documentos de un usuario a partir de su id
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: id del usuario que se desea solicitar.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                certified:
+                  type: string
+                  format: binary
+                identification: 
+                  type: string
+                  format: binary
+                cv-pet:
+                  type: string
+                  format: binary
+                picture":
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Documentos subidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: success
+                  payload:
+                    type: object
+                    $ref: "#components/schemas/User"
+        "400": 
+          description: Parametros invalidos o falta de archivos

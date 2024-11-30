@@ -19,6 +19,10 @@ export default class Users {
         return userModel.findByIdAndUpdate(id,{$set:doc}, {new:true});
     }
 
+    updateBy = (params,doc) =>{
+        return userModel.findOneAndUpdate(params,{$set:doc}, {new:true});
+    }
+
     updateSubdocs = (id, opt) => {
         return userModel.findByIdAndUpdate(id, opt, {new:true});
     }

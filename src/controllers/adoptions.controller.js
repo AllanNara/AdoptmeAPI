@@ -75,8 +75,8 @@ const createAdoption = async(req,res,next)=>{
         user.pets.push(pet._id);
         await usersService.update(user._id,{pets:user.pets})
         await petsService.update(pet._id,{adopted:true,owner:user._id})
-        await adoptionsService.create({owner:user._id,pet:pet._id})
-        res.send({status:"success",message:"Pet adopted"})
+        const adoption = await adoptionsService.create({owner:user._id,pet:pet._id})
+        res.status(201).send({status:"success",payload:adoption})
     } catch (error) {
         next(error)
     }

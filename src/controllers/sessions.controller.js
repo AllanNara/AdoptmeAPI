@@ -8,6 +8,7 @@ import {
   resourceNotFoundErrorInfo,
 } from "../services/errors/info.js";
 import EErrors from "../services/errors/enums.js";
+import customLogger from "../utils/winston.js";
 
 const register = async (req, res, next) => {
   try {
@@ -86,17 +87,21 @@ const login = async (req, res, next) => {
   }
 };
 
-const logout = async (req, res) => {
-  const cookie = req.cookies["coderCookie"];
-  if (cookie) {
-    const user = jwt.verify(cookie, "tokenSecretJWT");
-    user && await usersService.updateUserByEmail(user.email, { last_connection: new Date() });
+const logout = async (req, res, next) => {
+  try {
+    const cookie = req.cookies["coderCookie"];
+    if (cookie) {
+      const user = jwt.verify(cookie, "tokenSecretJWT");
+      user && await usersService.updateUserByEmail(user.email, { last_connection: new Date() });
+    }
+    res.clearCookie("coderCookie", {
+      httpOnly: true,
+      sameSite: "Strict",
+    });
+    res.send({ status: "success", message: "Logged out" });
+  } catch (error) {
+    next(error)  
   }
-  res.clearCookie("coderCookie", {
-    httpOnly: true,
-    sameSite: "Strict",
-  });
-  res.send({ status: "success", message: "Logged out" });
 };
 
 const current = async (req, res, next) => {

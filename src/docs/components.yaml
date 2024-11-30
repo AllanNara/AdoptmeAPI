@@ -24,6 +24,9 @@ components:
         pets:
           type: array
           description: Lista de mascotas del usuario
+        documents:
+          type: array
+          description: Lista de documentos del usuario con sus referencias
       example:
         _id: 65ef7085ed5e0f2672bc14fc
         first_name: 'Mauricio'
@@ -32,6 +35,7 @@ components:
         password: '$2b$10$Ja02M9Mba5jCBEhswu2zS.0ttCT0KFpnEa85VDvCTk4jYQLjSXziK'
         role: 'user'
         pets: []
+        documents: [ { name: 'certified', reference: '/Adoptme/src/public/tests/certified.jpg' } ]
         
     Pet:
       type: object
@@ -188,5 +192,5 @@ components:
             type: string
             description: Contraseña del usuario.
         example:
-          email: Oscar.Wolff@yahoo.com
-          password: "coder123"
+          email: correoMarisol@correo.com
+          password: "123"
