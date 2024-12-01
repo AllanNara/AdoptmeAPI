@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://cdn.worldvectorlogo.com/logos/nodejs.svg" width="700" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://cdn.worldvectorlogo.com/logos/nodejs.svg" width="500" alt="Nest Logo" /></a>
 </p>
 
 
@@ -16,9 +16,19 @@ docker compose up -d
 
 6. Levantar: ```npm start```
 
-7. Ejecutar Test Suite:
-``` npm test ```
+# Test & Docs
+
+__Ejecutar Test Suite__:
+```
+npm test
+```
 >no se requiere el servidor levantado, solo la base de datos mongo
+
+__Ruta Documentacion con Swagger__:
+```
+http://localhost:8080/apidocs
+```
+
 
 
 # Notes:
