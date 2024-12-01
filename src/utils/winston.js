@@ -33,9 +33,11 @@ if(config.NODE_ENV === "production") {
             winston.format.timestamp()
         )
 } else if(config.NODE_ENV === "test") {
+    customLogger.add(new winston.transports.Console({ level: "info" }));
     customLogger.add(new winston.transports.File({ filename: "logs/test.log", level: "http" }));
     customLogger.format = winston.format.combine(
-        winston.format.simple(),
+        winston.format.colorize(),
+        winston.format.simple()
     )
 } else {
     customLogger.add(new winston.transports.Console({ level: "debug" }));
